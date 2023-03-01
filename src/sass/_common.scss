@@ -1,1 +1,26 @@
 @import '~node_modules/modern-normalize/modern-normalize.css';
+
+img {
+  width: 100%;
+}
+
+.search-form {
+  background-color: blue;
+}
+
+.gallery {
+  display: flex;
+  gap: 15px;
+}
+
+.photo-card {
+  width: calc((100% - 15px * 3) / 4);
+  border: 1px solid grey;
+  border-bottom-left-radius: 5px;
+  border-bottom-right-radius: 5px;
+}
+
+.info {
+  display: flex;
+  justify-content: space-between;
+}

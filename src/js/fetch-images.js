@@ -15,16 +15,13 @@ try {
     const hits = await data.hits;
         const parameters = hits.map(getParameters);
         const markup = parameters.map(createCard).join('');
-        refs.gallery.insertAdjacentHTML('afterbegin', markup);
+  refs.gallery.insertAdjacentHTML('afterbegin', markup);
+  console.log(hits);
 } catch (error) {
     console.log(error);
     return;
 }
-
-    console.log(data);
-    console.log(hits);
-    console.log(parameters);
-    console.log(markup);
+  
 }
 
 function getParameters(img) {

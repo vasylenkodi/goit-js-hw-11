@@ -1,26 +1,48 @@
 export default class SearchQuery {
-  constructor(page, url, ref) {
-    this.page = page;
+  constructor(url, markupRef, loadMoreBtn) {
+    this.page = 1;
     this.url = url;
-    this.markupRef = ref;
+    this.markupRef = markupRef;
+    this.loadMoreBtn = loadMoreBtn;
   }
 
-  async fetchImages() {
+  async firstFetchImages() {
     try {
+      this.clearMarkup();
+      this.deactivateLoadMoreBtn();
+      this.url = `${this.url}&page=${this.page}`;
       const response = await fetch(this.url);
       const data = await response.json();
       const hits = await data.hits;
-      hits.map(this.getParameters);
+      this.parameters = hits.map(this.getParameters);
       this.markup = this.parameters.map(this.createCard).join('');
       this.createMarkup();
+      this.activateLoadMoreBtn();
+      this.page = this.page + 1;
     } catch (error) {
       console.log(error);
       return;
     }
   }
 
-  getParameters() {
-    this.parameters = {
+  async loadNewImages() {
+    try {
+      this.url = `${this.url}&page=${this.page}`;
+      const response = await fetch(this.url);
+      const data = await response.json();
+      const hits = await data.hits;
+      this.parameters = hits.map(this.getParameters);
+      this.markup = this.parameters.map(this.createCard).join('');
+      this.createMarkup();
+      this.page = this.page + 1;
+    } catch (error) {
+      console.log(error);
+      return;
+    }
+  }
+
+  getParameters(img) {
+    return {
       previewImg: img.webformatURL,
       originalImg: img.largeImageURL,
       about: img.tags,
@@ -44,6 +66,40 @@ export default class SearchQuery {
   }
 
   createMarkup() {
-    this.markupRef.insertAdjacentHTML('afterbegin', this.markup);
+    this.markupRef.insertAdjacentHTML('beforeend', this.markup);
+  }
+
+  setKey(newKey) {
+    if (this.key === newKey) {
+      return;
+    }
+    this.key = newKey;
+    this.url = `${this.url}&q=${this.key}`;
+    this.page = 1;
+  }
+
+  activateLoadMoreBtn() {
+    this.loadMoreBtn.classList.remove('visually-hidden');
+    this.loadMoreBtn.addEventListener(
+      'click',
+      this.onLoadMoreButtonClick.bind(this)
+    );
+  }
+
+  deactivateLoadMoreBtn() {
+    this.loadMoreBtn.classList.add('visually-hidden');
+    this.loadMoreBtn.removeEventListener(
+      'click',
+      this.onLoadMoreButtonClick.bind(this)
+    );
+  }
+
+  onLoadMoreButtonClick() {
+    console.log(this);
+    this.loadNewImages();
+  }
+
+  clearMarkup() {
+    this.markupRef.innerHTML = '';
   }
 }
